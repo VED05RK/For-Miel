@@ -1,0 +1,264 @@
+# For-Miel
+Cute messages for her
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>For You 💖</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #ffb6c1, #ffe4ec);
+        text-align: center;
+        padding: 40px;
+        overflow-x: hidden;
+    }
+
+    h1 { color: #ff2f68; }
+    h2, p { color: #6b0030; }
+
+    button {
+        padding: 15px 30px;
+        font-size: 18px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        margin: 10px;
+        background: #ff4d8d;
+        color: white;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        transition: transform 0.2s;
+    }
+
+    button:hover { transform: scale(1.05); }
+
+    #noBtn { background: gray; }
+
+    span {
+        font-size: 40px;
+        cursor: pointer;
+        margin: 10px;
+        display: inline-block;
+    }
+
+    .float {
+        position: fixed;
+        font-size: 30px;
+        animation: floatUp 10s linear infinite;
+        opacity: 0.8;
+    }
+
+    @keyframes floatUp {
+        from { transform: translateY(100vh); }
+        to { transform: translateY(-10vh); }
+    }
+
+    .chatBox {
+        max-width: 520px;
+        margin: auto;
+        background: #fff0f6;
+        padding: 20px;
+        border-radius: 20px;
+        text-align: left;
+    }
+
+    .msg { margin: 8px 0; }
+    .you { color: #ff2f68; }
+    .her { color: #6b0030; }
+
+    input {
+        width: 95%;
+        padding: 12px;
+        border-radius: 15px;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+<!-- Floating decorations -->
+<div class="float" style="left:10%;">🌸</div>
+<div class="float" style="left:30%; animation-duration:8s;">🐱</div>
+<div class="float" style="left:50%; animation-duration:11s;">💖</div>
+<div class="float" style="left:70%; animation-duration:9s;">🌷</div>
+<div class="float" style="left:90%; animation-duration:12s;">🐱</div>
+
+<div id="page"></div>
+
+<script>
+let stage = sessionStorage.getItem("stage") || "question";
+let yesSize = 20;
+let hearts = Number(sessionStorage.getItem("hearts")) || 0;
+
+/* CHAT DATA */
+let chatStep = Number(sessionStorage.getItem("chatStep")) || 0;
+let chatLog = JSON.parse(sessionStorage.getItem("chatLog")) || [];
+
+const chatQuestions = [
+    "Hi mylove 😙",
+    "Can I ask you something? 💖",
+    "How was your day today? 😊",
+    "Do you know how special you are to me? 🌸",
+    "Special child jwk hahaha, Will you be my Valentine? 💕"
+];
+
+function render() {
+    const page = document.getElementById("page");
+
+    /* QUESTION */
+    if (stage === "question") {
+        page.innerHTML = `
+            <h1>Hi Mylove 🌸</h1>
+            <p>🐱🌸🐱🌸🐱</p>
+            <h2>Do you want to continue ? 😳💕</h2>
+            <button id="yesBtn" onclick="next('chat')">Yes 💖</button>
+            <button id="noBtn" onclick="growYes()">kiss danay 😙😙</button>
+        `;
+    }
+
+    /* CHAT FIRST */
+    if (stage === "chat") {
+        let chatHTML = chatLog.map(
+            m => `<div class="msg"><b class="${m.from}">
+                ${m.from === 'you' ? 'You' : 'Her'}:</b> ${m.text}</div>`
+        ).join("");
+
+        page.innerHTML = `
+            <h1>💬 Our Chat 💬</h1>
+            <div class="chatBox">${chatHTML}</div>
+
+            ${
+                chatStep < chatQuestions.length
+                ? `
+                    <p><b class="you">You:</b> ${chatQuestions[chatStep]}</p>
+                    <input id="answer" placeholder="Type your answer here...">
+                    <button onclick="sendAnswer()">Send 💌</button>
+                  `
+                : `<button onclick="next('msg1')">Continue ➡️</button>`
+            }
+        `;
+    }
+
+    /* MESSAGES */
+    if (stage === "msg1") {
+        page.innerHTML = `
+            <h1>🌸 Message 1 🌸</h1>
+            <p>I made this random cute thing and I hope you like it 💖<br>
+            Syempre IT ta bay hahaha 😆</p>
+            <button onclick="next('msg2')">Continue ➡️</button>
+        `;
+    }
+
+    if (stage === "msg2") {
+        page.innerHTML = `
+            <h1>🐱 Message 2 🐱</h1>
+            <p>You’re the prettiest, loving, kind, gorgeousaurus cutiepie
+            woman I’ve ever met 😺💗</p>
+            <button onclick="next('msg3')">Continue ➡️</button>
+        `;
+    }
+
+    if (stage === "msg3") {
+        page.innerHTML = `
+            <h1>💖 Message 3 💖</h1>
+            <p>Sorry kun gina ragebait taka pirme 😆
+            part lang sang pagpalangga, I LOVE YOU SO MUCHH😘🌸</p>
+            <button onclick="next('quiz')">Continue ➡️</button>
+        `;
+    }
+
+    /* QUIZ */
+    if (stage === "quiz") {
+        page.innerHTML = `
+            <h1>🎯 Mini Quiz 🎯</h1>
+            <p>What do I like the most? 🤔</p>
+            <button onclick="quizAnswer()">💻 Coding</button>
+            <button onclick="quizAnswer()">🍕 Food</button>
+            <button onclick="quizAnswer()">💖 Si Miel</button>
+            <p id="quizResult"></p>
+        `;
+    }
+
+    /* GAME */
+    if (stage === "game") {
+        page.innerHTML = `
+            <h1>💖 Collect My Love 💖</h1>
+            <p>Click all the hearts 💕</p>
+            <div>
+                <span onclick="collect(this)">💖</span>
+                <span onclick="collect(this)">💖</span>
+                <span onclick="collect(this)">💖</span>
+                <span onclick="collect(this)">💖</span>
+                <span onclick="collect(this)">💖</span>
+            </div>
+            <p id="score">Hearts collected: ${hearts}</p>
+            <h2 id="final" style="display:none;">
+                You collected all my love grabe may galaw 💞<br>
+                You are officially my Valentine Hehe😙😙💕
+            </h2>
+        `;
+    }
+}
+
+function growYes() {
+    yesSize += 20;
+    const yes = document.getElementById("yesBtn");
+    yes.style.fontSize = yesSize + "px";
+    yes.style.padding = yesSize + "px";
+
+    if (yesSize > window.innerWidth / 2) {
+        yes.style.width = "100vw";
+        yes.style.height = "100vh";
+        yes.innerText = "YES 💖";
+        document.getElementById("noBtn").style.display = "none";
+    }
+}
+
+function sendAnswer() {
+    const input = document.getElementById("answer");
+    if (!input.value) return;
+
+    chatLog.push({ from: "her", text: input.value });
+    sessionStorage.setItem("chatLog", JSON.stringify(chatLog));
+
+    chatStep++;
+    sessionStorage.setItem("chatStep", chatStep);
+    render();
+}
+
+function quizAnswer() {
+    document.getElementById("quizResult").innerHTML = `
+        <b>Oo weh 😌💖</b><br>
+        Syempre si Miel sya lang lovelove ko ehh❤️❤️!<br><br>
+        <button onclick="next('game')">Play Game 🎮</button>
+    `;
+}
+
+function collect(el) {
+    el.style.display = "none";
+    hearts++;
+    sessionStorage.setItem("hearts", hearts);
+    document.getElementById("score").innerText =
+        "Hearts collected: " + hearts;
+
+    if (hearts === 5) {
+        document.getElementById("final").style.display = "block";
+    }
+}
+
+function next(s) {
+    stage = s;
+    sessionStorage.setItem("stage", stage);
+    location.reload();
+}
+
+render();
+</script>
+
+</body>
+</html>
+
